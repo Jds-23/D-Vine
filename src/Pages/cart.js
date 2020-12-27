@@ -13,10 +13,9 @@ const Cart = (props) => {
         quantity: 1,
       });
     });
-  }, [fakeData, setPayment]);
-  const cart = useContext(StripeContext);
-  console.log("cart", cart);
-  console.log("setPayment", setPayment);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // const cart = useContext(StripeContext);
   const totalPrice = () => {
     let total = 0;
 

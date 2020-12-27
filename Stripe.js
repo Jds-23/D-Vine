@@ -25,22 +25,38 @@ dotenv.config({
 
 const stripe = require("stripe")(process.env.REACT_APP_STRIPE_SECRET_KEY);
 
-app.post("/create-payment-intent", async (req, res) => {
-  const { amount, currency } = req.body;
-  console.log(req.body);
+// app.post("/create-payment-intent", async (req, res) => {
+//   const { amount, currency } = req.body;
+//   console.log(req.body);
 
-  const customer = await stripe.customers.create();
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    customer: customer.id,
-    setup_future_usage: "off_session",
-    amount: amount,
-    currency: currency,
+//   const customer = await stripe.customers.create();
+//   // Create a PaymentIntent with the order amount and currency
+//   const paymentIntent = await stripe.paymentIntents.create({
+//     customer: customer.id,
+//     setup_future_usage: "off_session",
+//     amount: amount,
+//     currency: currency,
+//   });
+//   res.send({
+//     clientSecret: paymentIntent.client_secret,
+//   });
+// });
+app.post("/create-checkout-session", async (req, res) => {
+  const line_items = req.body;
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["ideal"],
+
+    // or you can take multiple payment methods with
+    // payment_method_types: ['card', 'ideal', ...]
+    line_items,
+    mode: "payment",
+    success_url: "https://example.com/success",
+    cancel_url: "https://example.com/cancel",
   });
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
+
+  res.json({ id: session.id });
 });
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
